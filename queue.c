@@ -154,10 +154,20 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
         q->tail = q->head;
 
 
+    if (sp != NULL) {
+        strncpy(sp, tmp->value, bufsize - 1);
+        if (strlen(tmp->value) >= bufsize)
+            sp[bufsize - 1] = '\0';
+    }
+    /*
     if (sp == NULL) {
-        sp = malloc(sizeof(char) * bufsize);
+        if((sp = malloc(sizeof(char) * bufsize)) == NULL)
+            return false;
     }
     strcpy(sp, tmp->value);
+    if (strlen(tmp->value) >= bufsize)
+        sp[bufsize-1] = '\0';
+    */
     free(tmp->value);
     free(tmp);
 
