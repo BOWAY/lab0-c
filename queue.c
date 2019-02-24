@@ -45,7 +45,7 @@ void q_free(queue_t *q)
             free(tmp->value);
             free(tmp);
         }
-
+        // free(q->tail);
         free(q);
     }
 }
@@ -114,7 +114,7 @@ bool q_insert_tail(queue_t *q, char *s)
 
     if ((newt = malloc(sizeof(list_ele_t))) == NULL)
         return false;
-    if ((newt->value = malloc(sizeof(s_len))) == NULL) {
+    if ((newt->value = malloc(sizeof(char) * s_len)) == NULL) {
         free(newt);
         return false;
     }
@@ -122,8 +122,7 @@ bool q_insert_tail(queue_t *q, char *s)
     newt->next = NULL;
 
     if (q->head == NULL) {
-        q->head = newt;
-        q->tail = newt;
+        q->head = q->tail = newt;
         q->count = 0;
     } else {
         q->tail = q->tail->next = newt;
