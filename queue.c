@@ -38,7 +38,16 @@ void q_free(queue_t *q)
 {
     /* How about freeing the list elements and the strings? */
     /* Free queue structure */
-    free(q);
+    if (q != NULL) {
+        while (q->head != NULL) {
+            list_ele_t *tmp = q->head;
+            q->head = q->head->next;
+            free(tmp->value);
+            free(tmp);
+        }
+
+        free(q);
+    }
 }
 
 /*
@@ -50,28 +59,22 @@ void q_free(queue_t *q)
  */
 bool q_insert_head(queue_t *q, char *s)
 {
+    if (q == NULL)
+        return false;
+
     list_ele_t *newh;
-    /* What should you do if the q is NULL? */
+    int s_len = strlen(s) + 1;
 
     if ((newh = malloc(sizeof(list_ele_t))) == NULL)
         return false;
-    if ((newh->value = malloc(sizeof(*s))) == NULL) {
+    if ((newh->value = malloc(sizeof(char) * s_len)) == NULL) {
         free(newh);
         return false;
     }
 
     strcpy(newh->value, s);
 
-    if (q == NULL) {
-        if ((q = malloc(sizeof(queue_t))) == NULL) {
-            free(newh->value);
-            free(newh);
-            return false;
-        }
-        q->head = newh;
-        q->tail = newh;
-        q->count = 0;
-    } else if (q->head == NULL) {
+    if (q->head == NULL) {
         q->head = q->tail = newh;
         newh->next = NULL;
     }
@@ -103,23 +106,22 @@ bool q_insert_tail(queue_t *q, char *s)
 {
     /* You need to write the complete code for this function */
     /* Remember: It should operate in O(1) time */
+    if (q == NULL)
+        return false;
+
     list_ele_t *newt;
+    int s_len = strlen(s) + 1;
+
     if ((newt = malloc(sizeof(list_ele_t))) == NULL)
         return false;
-    if ((newt->value = malloc(sizeof(*s))) == NULL) {
+    if ((newt->value = malloc(sizeof(s_len))) == NULL) {
         free(newt);
         return false;
     }
     strcpy(newt->value, s);
     newt->next = NULL;
 
-    if (q == NULL || q->head == NULL) {
-        if (q == NULL)
-            if ((q = malloc(sizeof(queue_t))) == NULL) {
-                free(newt->value);
-                free(newt);
-                return false;
-            }
+    if (q->head == NULL) {
         q->head = newt;
         q->tail = newt;
         q->count = 0;
