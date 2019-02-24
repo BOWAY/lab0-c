@@ -26,6 +26,8 @@ queue_t *q_new()
 {
     queue_t *q = malloc(sizeof(queue_t));
     /* What if malloc returned NULL? */
+    if (q == NULL)
+        return NULL;
     q->head = NULL;
     return q;
 }
@@ -50,10 +52,34 @@ bool q_insert_head(queue_t *q, char *s)
     list_ele_t *newh;
     /* What should you do if the q is NULL? */
     newh = malloc(sizeof(list_ele_t));
+    newh->value = malloc(sizeof(*s));
+
+    if (newh == NULL || newh->value == NULL)
+        return false;
+    strcpy(newh->value, s);
+
+    if (q == NULL) {
+        if ((q = malloc(sizeof(queue_t))) == NULL) {
+            free(newh);
+            return false;
+        }
+        q->head = newh;
+        q->tail = newh;
+    } else if (q->head == NULL) {
+        q->head = q->tail = newh;
+        newh->next = NULL;
+    }
+
+    else {
+        newh->next = q->head;
+        q->head = newh;
+    }
+
     /* Don't forget to allocate space for the string and copy it */
+
     /* What if either call to malloc returns NULL? */
-    newh->next = q->head;
-    q->head = newh;
+
+
     return true;
 }
 
@@ -69,7 +95,30 @@ bool q_insert_tail(queue_t *q, char *s)
 {
     /* You need to write the complete code for this function */
     /* Remember: It should operate in O(1) time */
-    return false;
+    list_ele_t *newt;
+    if ((newt = malloc(sizeof(list_ele_t))) == NULL)
+        return false;
+    if ((newt->value = malloc(sizeof(*s))) == NULL) {
+        free(newt);
+        return false;
+    }
+    strcpy(newt->value, s);
+    newt->next = NULL;
+
+    if (q == NULL || q->head == NULL) {
+        if (q == NULL)
+            if ((q = malloc(sizeof(queue_t))) == NULL) {
+                free(newt);
+                return false;
+            }
+        q->head = newt;
+        q->tail = newt;
+    } else {
+        q->tail = q->tail->next = newt;
+    }
+
+
+    return true;
 }
 
 /*
@@ -83,7 +132,25 @@ bool q_insert_tail(queue_t *q, char *s)
 bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
 {
     /* You need to fix up this code. */
+    if (q == NULL)
+        return false;
+    if (q->head == NULL) {
+        free(q);
+        return false;
+    }
+
+    list_ele_t *tmp;
+    tmp = q->head;
     q->head = q->head->next;
+    if (tmp->next == NULL)
+        q->tail = q->head;
+
+    if (sp == NULL) {
+        sp = malloc(sizeof(char) * bufsize);
+    }
+    strcpy(sp, tmp->value);
+    free(tmp);
+
     return true;
 }
 
