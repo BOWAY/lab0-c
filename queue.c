@@ -75,6 +75,8 @@ bool q_insert_head(queue_t *q, char *s)
         q->head = newh;
     }
 
+    q->count++;
+
     /* Don't forget to allocate space for the string and copy it */
 
     /* What if either call to malloc returns NULL? */
@@ -117,6 +119,7 @@ bool q_insert_tail(queue_t *q, char *s)
         q->tail = q->tail->next = newt;
     }
 
+    q->count++;
 
     return true;
 }
@@ -151,6 +154,8 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
     strcpy(sp, tmp->value);
     free(tmp);
 
+    q->count--;
+
     return true;
 }
 
@@ -162,7 +167,10 @@ int q_size(queue_t *q)
 {
     /* You need to write the code for this function */
     /* Remember: It should operate in O(1) time */
-    return 0;
+    if (q == NULL)
+        return 0;
+
+    return q->count;
 }
 
 /*
