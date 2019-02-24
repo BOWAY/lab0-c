@@ -52,15 +52,19 @@ bool q_insert_head(queue_t *q, char *s)
 {
     list_ele_t *newh;
     /* What should you do if the q is NULL? */
-    newh = malloc(sizeof(list_ele_t));
-    newh->value = malloc(sizeof(*s));
 
-    if (newh == NULL || newh->value == NULL)
+    if ((newh = malloc(sizeof(list_ele_t))) == NULL)
         return false;
+    if ((newh->value = malloc(sizeof(*s))) == NULL) {
+        free(newh);
+        return false;
+    }
+
     strcpy(newh->value, s);
 
     if (q == NULL) {
         if ((q = malloc(sizeof(queue_t))) == NULL) {
+            free(newh->value);
             free(newh);
             return false;
         }
@@ -112,6 +116,7 @@ bool q_insert_tail(queue_t *q, char *s)
     if (q == NULL || q->head == NULL) {
         if (q == NULL)
             if ((q = malloc(sizeof(queue_t))) == NULL) {
+                free(newt->value);
                 free(newt);
                 return false;
             }
@@ -138,12 +143,8 @@ bool q_insert_tail(queue_t *q, char *s)
 bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
 {
     /* You need to fix up this code. */
-    if (q == NULL)
+    if (q == NULL || q->head == NULL)
         return false;
-    if (q->head == NULL) {
-        free(q);
-        return false;
-    }
 
     list_ele_t *tmp;
     tmp = q->head;
@@ -151,10 +152,12 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
     if (tmp->next == NULL)
         q->tail = q->head;
 
+
     if (sp == NULL) {
         sp = malloc(sizeof(char) * bufsize);
     }
     strcpy(sp, tmp->value);
+    free(tmp->value);
     free(tmp);
 
     q->count--;
